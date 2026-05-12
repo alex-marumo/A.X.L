@@ -84,6 +84,8 @@ pub struct Cli {
     /// Input text
     #[clap(trailing_var_arg = true)]
     text: Vec<String>,
+    #[arg(long, help = "Output JSON for machine parsing")]
+    pub json: bool,
 }
 
 impl Cli {

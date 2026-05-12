@@ -20,7 +20,7 @@ use crate::config::{
     ensure_parent_exists, list_agents, load_env_file, macro_execute, Config, GlobalConfig, Input,
     WorkingMode, CODE_ROLE, EXPLAIN_SHELL_ROLE, SHELL_ROLE, TEMP_SESSION_NAME,
 };
-use crate::render::render_error;
+use crate::render::{render_error, JsonRender};
 use crate::repl::Repl;
 use crate::utils::*;
 
@@ -97,6 +97,11 @@ async fn run(config: GlobalConfig, cli: Cli, text: Option<String>) -> Result<()>
 
     if cli.dry_run {
         config.write().dry_run = true;
+    }
+
+    if cli.json {
+        config.write().use_json = true;
+        config.write().stream = false;
     }
 
     if let Some(agent) = &cli.agent {
@@ -201,6 +206,8 @@ async fn start_directive(
 ) -> Result<()> {
     let client = input.create_client()?;
     let extract_code = !*IS_STDOUT_TERMINAL && code_mode;
+    let use_json = config.read().use_json;
+
     config.write().before_chat_completion(&input)?;
     let (output, tool_results) = if !input.stream() || extract_code {
         call_chat_completions(
@@ -214,6 +221,13 @@ async fn start_directive(
     } else {
         call_chat_completions_streaming(&input, client.as_ref(), abort_signal.clone()).await?
     };
+
+    if use_json {
+        println!("{}", render::JsonRender::render(&output));
+        config.write().exit_session()?;
+        return Ok(());
+    }
+
     config
         .write()
         .after_chat_completion(&input, &output, &tool_results)?;

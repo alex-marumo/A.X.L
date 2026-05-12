@@ -172,6 +172,8 @@ pub struct Config {
     pub rag: Option<Arc<Rag>>,
     #[serde(skip)]
     pub agent: Option<Agent>,
+
+    pub use_json: bool,
 }
 
 impl Default for Config {
@@ -236,6 +238,8 @@ impl Default for Config {
             session: None,
             rag: None,
             agent: None,
+
+            use_json: false,
         }
     }
 }
