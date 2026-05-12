@@ -20,7 +20,7 @@ use crate::config::{
     ensure_parent_exists, list_agents, load_env_file, macro_execute, Config, GlobalConfig, Input,
     WorkingMode, CODE_ROLE, EXPLAIN_SHELL_ROLE, SHELL_ROLE, TEMP_SESSION_NAME,
 };
-use crate::render::{render_error, JsonRender};
+use crate::render::render_error;
 use crate::repl::Repl;
 use crate::utils::*;
 
